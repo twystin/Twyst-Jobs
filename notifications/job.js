@@ -4,8 +4,7 @@ var SmsSender = require('./SmsSender');
 var GcmBatcher = require('./gcmBatcher');
 var rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = [new schedule.Range(0, 6)];
-rule.hour = 11;
-rule.minute = 36;
+rule.minute = 32;
 
 var mongoose = require('mongoose');
 var fs = require('fs');
@@ -60,6 +59,7 @@ function smsNotifs (callback) {
 		else {
 			notifs.forEach(function (item) {
 				item.status = 'SENT';
+				item.sent_at = Date.now();
 				item.save();
 				if(item.phones && item.phones.length > 0) {
 					item.phones.forEach(function (phone) {
@@ -100,6 +100,7 @@ function gcmNotifs (callback) {
 		else {
 			notifs.forEach(function (item) {
 				item.status = 'SENT';
+				item.sent_at = Date.now();
 				item.save();
 				GcmBatcher.sendPush(item);
 				if (--length === 0) {

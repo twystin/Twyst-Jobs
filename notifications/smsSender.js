@@ -1,10 +1,10 @@
 var sms_push_url = "http://myvaluefirst.com/smpp/sendsms?username=twysthttp&password=twystht6&to=";
-var smsMessageSentLogs = require('../models/smsMessageSentLogs');
 var http = require('http');
 http.post = require('http-post');
 var mongoose = require('mongoose');
+var conn2 = mongoose.createConnection('mongodb://54.214.46.139/twyst');
 var smsSentLog = require('../models/smsMessageSentLogs');
-var SmsSentLog = mongoose.model('SmsSentLog');
+var SmsSentLog = conn2.model('SmsSentLog');
 
 module.exports.sendSms = function (phone, push_message) {
 
