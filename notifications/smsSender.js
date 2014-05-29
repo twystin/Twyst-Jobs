@@ -24,8 +24,6 @@ module.exports.sendSms = function (phone, push_message) {
             // append chunk to your data
             body += chunk;
         });
-    },100);
-
         res.on('end', function() {
             console.log(body);
         });
@@ -34,7 +32,9 @@ module.exports.sendSms = function (phone, push_message) {
             console.log("Error message: " + e.message)
         });
 	});
+    },100);
 }
+
 
 function saveSentSms (phone, message) {
 
