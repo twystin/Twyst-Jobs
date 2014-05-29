@@ -1,6 +1,6 @@
 var schedule = require('node-schedule');
 var async = require('async');
-var SmsSender = require('./SmsSender');
+var SmsSender = require('./smsSender');
 var GcmBatcher = require('./gcmBatcher');
 var rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = [new schedule.Range(0, 6)];

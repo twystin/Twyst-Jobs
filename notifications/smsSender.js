@@ -16,12 +16,15 @@ module.exports.sendSms = function (phone, push_message) {
 	saveSentSms(phone, message);
 	var send_sms_url = sms_push_url + phone + "&from=TWYSTR&udh=0&text=" + message;
 	var test_url = 'http://staging.twyst.in/api/v2/sms/status';
+
+    setTimeout(function() { 
 	http.post(send_sms_url, function(res){
 		console.log(res.statusCode);
 		res.on('data', function(chunk) {
             // append chunk to your data
             body += chunk;
         });
+    },100);
 
         res.on('end', function() {
             console.log(body);
