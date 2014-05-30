@@ -1,4 +1,3 @@
-// [AR] Include dependencies
 var fs = require('fs');
 var schedule = require('node-schedule');
 var async = require('async');
@@ -14,7 +13,6 @@ mongoose.connect('mongodb://localhost/twyst');
 var job = schedule.scheduleJob({minute:35, dayOfWeek: [new schedule.Range(0,6)]}, jobRunner);
 
 function jobRunner() {
-    console.log("Sending the SMS and Push notifications");
     async.parallel({
 	sms: function(callback) {
   	    smsNotifications(callback);
@@ -59,9 +57,7 @@ function gcmNotifications (callback) {
 	processNotifications(
 	    notifs, 
 	    callback, 
-	    function(gcm_item) {
-		GcmBatcher.sendPush(gcm_item); //TODO: Replace with the right stuff
-	    }
+	    GcmBatcher.sendPush
 	);
     }
 }

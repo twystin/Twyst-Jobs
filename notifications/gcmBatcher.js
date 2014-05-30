@@ -2,12 +2,9 @@ var gcm = require('node-gcm');
 var fs = require('fs');
 
 module.exports.sendPush = function (item) {
-
 	//API Server Key
 	var sender = new gcm.Sender(item.server_key);
-
 	var message = new gcm.Message();
-
 	// Value the payload data to send...
 	message.addData('message', item.body);
 	message.addData('title', item.head);
