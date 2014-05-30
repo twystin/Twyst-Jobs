@@ -1,112 +1,108 @@
+// [AR] Include dependencies
+var fs = require('fs');
 var schedule = require('node-schedule');
 var async = require('async');
 var SmsSender = require('./smsSender');
 var GcmBatcher = require('./gcmBatcher');
-var rule = new schedule.RecurrenceRule();
-rule.dayOfWeek = [new schedule.Range(0, 6)];
-rule.minute = 32;
-
-var mongoose = require('mongoose');
-var fs = require('fs');
-
-mongoose.connect('mongodb://localhost/twyst');
-
-var Schema = mongoose.Schema;
 var notif = require('../models/notif');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 var Notif = mongoose.model('Notif');
 
-seriesExecuter();
-var j = schedule.scheduleJob(rule, function(){	
-	seriesExecuter();
-});
+mongoose.connect('mongodb://localhost/twyst');
+var j = schedule.scheduleJob({minute:34, dayOfWeek: [new schedule.Range(0,6)]}, jobRunner);
 
-function seriesExecuter() {
-	async.parallel({
-	    sms: function(callback) {
-	    	smsNotifs(callback);
-	    },
-	    gcm: function(callback) {
-	    	gcmNotifs(callback);
-	    }
-	}, function(err, results) {
-	    console.log(results);
-	});
-
+function jobRunner() {
+    console.log("Sending the SMS and Push notifications");
+    async.parallel({
+	sms: function(callback) {
+  	    smsNotifs(callback);
+	},
+	gcm: function(callback) {
+    	    gcmNotifs(callback);
+	}
+    }, function(err, results) {
+	console.log(results);
+    });
 };
 
+
 function smsNotifs (callback) {
-	Notif.find({
-		message_type: 'SMS',
-		scheduled_at: {
-			$gte: new Date(Date.now() - 30 * 60 * 1000),
-			$lt: new Date(Date.now() + 30 * 60 * 1000)
-		},
-		status: 'DRAFT'
-	}, function(err, notifs) {
-		if(err) {
-			console.log(err);
-		}
-		else {
-			sendSmsNotifs(notifs);
-		}
-	});
+    getNotifications(
+	'SMS', 
+	new Date(Date.now() - 30 * 60 * 1000), 
+	new Date(Date.now() + 30 * 60 * 1000), 
+	'DRAFT', 
+	sendSmsNotifs
+    );
 
-	function sendSmsNotifs (notifs) {
-		var length = notifs.length;
-		if(length === 0) {
-			callback(null, notifs);
+    function sendSmsNotifs (notifs) {
+	processNotifications(
+	    notifs, 
+	    callback, 
+	    function(item) {
+		if(item.phones && item.phones.length > 0) {
+		    item.phones.forEach(function (phone) {
+			SmsSender.sendSms(phone, item.body);
+		    });
 		}
-		else {
-			notifs.forEach(function (item) {
-				item.status = 'SENT';
-				item.sent_at = Date.now();
-				item.save();
-				if(item.phones && item.phones.length > 0) {
-					item.phones.forEach(function (phone) {
-						SmsSender.sendSms(phone, item.body);
-					});
-				}
-				if (--length === 0) {
-					callback(null, notifs);
-				};
-			});
-		}
-	}
+	    }
+	);
+    }
 }
-
 
 function gcmNotifs (callback) {
-	Notif.find({
-		message_type: 'GCM',
-		scheduled_at: {
-			$gte: new Date(Date.now() - 30 * 60 * 1000),
-			$lt: new Date(Date.now() + 30 * 60 * 1000)
-		},
-		status: 'DRAFT'
-	}, function(err, notifs) {
-		if(err) {
-			console.log(err);
-		}
-		else {
-			sendGcmNotifs(notifs);
-		}
-	});
+    getNotifications(
+	'GCM',
+	new Date(Date.now() - 30 * 60 * 1000),
+	new Date(Date.now() + 30 * 60 * 1000),
+	'DRAFT',
+	sendGcmNotifs
+    );
 
-	function sendGcmNotifs (notifs) {
-		var length = notifs.length;
-		if (length === 0) {
-			callback(null, notifs);
-		}
-		else {
-			notifs.forEach(function (item) {
-				item.status = 'SENT';
-				item.sent_at = Date.now();
-				item.save();
-				GcmBatcher.sendPush(item);
-				if (--length === 0) {
-					callback(null, notifs);
-				};
-			});
-		}
-	}
+    function sendGcmNotifs (notifs) {
+	processNotifications(
+	    notifs, 
+	    callback, 
+	    function(item) {
+		GcmBatcher.sendPush(item);
+	    }
+	);
+    }
 }
+
+// [AR] Added these as helper functions
+function processNotifications(notifs, callback, doSomething) {
+    if (notifs.length === 0) {
+	callback(null, notifs);
+    } else {
+	notifs.forEach(function(item) {
+	    item.status = 'SENT';
+	    item.sent_at = Date.now();
+	    item.save();
+	    doSomething(item);
+	    if (--length === 0) {
+		callback(null, notifs);
+	    };
+	});
+    }
+}
+
+function getNotifications(type, begin, end, status, callback) {
+    console.log("Getting notifications from the database");
+    Notif.find({
+	message_type: type,
+	scheduled_at: {
+	    $gte: begin,
+	    $lte: end
+	},
+	status: status
+    }, function(err, notifs) {
+	if (err) { 
+	    console.log(err); 
+	} else {
+	    console.log("Sending back: " + notifs);
+	    callback(notifs);
+	}
+    });
+};
