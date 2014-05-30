@@ -10,16 +10,17 @@ var Schema = mongoose.Schema;
 var Notif = mongoose.model('Notif');
 
 mongoose.connect('mongodb://localhost/twyst');
-var j = schedule.scheduleJob({minute:34, dayOfWeek: [new schedule.Range(0,6)]}, jobRunner);
+
+var job = schedule.scheduleJob({minute:35, dayOfWeek: [new schedule.Range(0,6)]}, jobRunner);
 
 function jobRunner() {
     console.log("Sending the SMS and Push notifications");
     async.parallel({
 	sms: function(callback) {
-  	    smsNotifs(callback);
+  	    smsNotifications(callback);
 	},
 	gcm: function(callback) {
-    	    gcmNotifs(callback);
+    	    gcmNotifications(callback);
 	}
     }, function(err, results) {
 	console.log(results);
@@ -27,45 +28,39 @@ function jobRunner() {
 };
 
 
-function smsNotifs (callback) {
+function smsNotifications (callback) {
     getNotifications(
 	'SMS', 
 	new Date(Date.now() - 30 * 60 * 1000), 
 	new Date(Date.now() + 30 * 60 * 1000), 
 	'DRAFT', 
-	sendSmsNotifs
+	processSMSNotifications
     );
 
-    function sendSmsNotifs (notifs) {
+    function processSMSNotifications (notifs) {
 	processNotifications(
 	    notifs, 
 	    callback, 
-	    function(item) {
-		if(item.phones && item.phones.length > 0) {
-		    item.phones.forEach(function (phone) {
-			SmsSender.sendSms(phone, item.body);
-		    });
-		}
-	    }
+	    SmsSender.sendBulkSMS
 	);
     }
 }
 
-function gcmNotifs (callback) {
+function gcmNotifications (callback) {
     getNotifications(
 	'GCM',
 	new Date(Date.now() - 30 * 60 * 1000),
 	new Date(Date.now() + 30 * 60 * 1000),
 	'DRAFT',
-	sendGcmNotifs
+	processGCMNotifications
     );
 
-    function sendGcmNotifs (notifs) {
+    function processGCMNotifications (notifs) {
 	processNotifications(
 	    notifs, 
 	    callback, 
-	    function(item) {
-		GcmBatcher.sendPush(item);
+	    function(gcm_item) {
+		GcmBatcher.sendPush(gcm_item); //TODO: Replace with the right stuff
 	    }
 	);
     }
@@ -73,14 +68,15 @@ function gcmNotifs (callback) {
 
 // [AR] Added these as helper functions
 function processNotifications(notifs, callback, doSomething) {
-    if (notifs.length === 0) {
+    var length = notifs.length || 0;
+    if (length === 0) {
 	callback(null, notifs);
     } else {
 	notifs.forEach(function(item) {
 	    item.status = 'SENT';
 	    item.sent_at = Date.now();
 	    item.save();
-	    doSomething(item);
+	    doSomething(item)
 	    if (--length === 0) {
 		callback(null, notifs);
 	    };
@@ -101,7 +97,6 @@ function getNotifications(type, begin, end, status, callback) {
 	if (err) { 
 	    console.log(err); 
 	} else {
-	    console.log("Sending back: " + notifs);
 	    callback(notifs);
 	}
     });
