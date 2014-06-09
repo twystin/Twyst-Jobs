@@ -10,7 +10,7 @@ var Notif = mongoose.model('Notif');
 
 mongoose.connect('mongodb://localhost/twyst');
 
-var job = schedule.scheduleJob({minute:35, dayOfWeek: [new schedule.Range(0,6)]}, jobRunner);
+var job = schedule.scheduleJob({minute: 56, dayOfWeek: [new schedule.Range(0,6)]}, jobRunner);
 
 function jobRunner() {
     async.parallel({
@@ -29,8 +29,8 @@ function jobRunner() {
 function smsNotifications (callback) {
     getNotifications(
 	'SMS', 
-	new Date(Date.now() - 30 * 60 * 1000), 
-	new Date(Date.now() + 30 * 60 * 1000), 
+	new Date(Date.now() - 12 * 60 * 60 * 1000), 
+	new Date(Date.now() + 12 * 60 * 60 * 1000), 
 	'DRAFT', 
 	processSMSNotifications
     );
@@ -47,8 +47,8 @@ function smsNotifications (callback) {
 function gcmNotifications (callback) {
     getNotifications(
 	'GCM',
-	new Date(Date.now() - 30 * 60 * 1000),
-	new Date(Date.now() + 30 * 60 * 1000),
+	new Date(Date.now() - 12 * 60 * 60 * 1000),
+	new Date(Date.now() + 12 * 60 * 60 * 1000),
 	'DRAFT',
 	processGCMNotifications
     );
