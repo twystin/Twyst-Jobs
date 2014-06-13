@@ -4,8 +4,9 @@ var http = require('http');
 module.exports.sendBulkSMS = function(item) {
     var body = "";
     message = item.body;
-    message.replace(/(\n)+/g, '');
-    message.replace(/% /g,'%25 ');
+    message = message.replace(/(\n)+/g, '');    
+    message = message.replace(/&/g,'%26');
+    message = message.replace(/% /g,'%25 ');
     phones = item.phones.join(',');
     var send_sms_url = sms_push_url + 
 	phones + 
