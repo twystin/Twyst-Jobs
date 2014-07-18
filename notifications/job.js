@@ -29,8 +29,8 @@ function jobRunner() {
 function smsNotifications (callback) {
     getNotifications(
 	'SMS', 
-	new Date(Date.now() - 12 * 60 * 60 * 1000), 
-	new Date(Date.now() + 12 * 60 * 60 * 1000), 
+	new Date(Date.now() - 30 * 60 * 1000), 
+	new Date(Date.now() + 30 * 60 * 1000), 
 	'DRAFT', 
 	processSMSNotifications
     );
