@@ -27,8 +27,8 @@ function smsNotifications () {
 				});
 			}
 			else {
-				console.log("Notifs sent at: " + new Date())
 			}
+			console.log("Notifs sent at: " + new Date())
 		}
     );
 }
