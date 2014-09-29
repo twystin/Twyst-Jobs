@@ -33,7 +33,7 @@ module.exports.sendBulkSMS = function(item) {
 // But makes better reading here
 
 var mongoose = require('mongoose');
-var conn2 = mongoose.createConnection('mongodb://54.214.46.139/twyst');
+var conn2 = mongoose.createConnection('mongodb://50.112.253.131/twyst');
 var smsSentLog = require('../models/smsMessageSentLogs');
 var SmsSentLog = conn2.model('SmsSentLog');
 
