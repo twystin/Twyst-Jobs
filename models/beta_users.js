@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var BetaUsersSchema = new Schema({
-    email: {type: String, trim: true, required: true, unique: true},
+    email: {type: String, trim: true},
     city: {type: String, trim: true},
     name: {type: String, trim: true},
     phone: {type: String, trim: true},

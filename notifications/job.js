@@ -55,7 +55,7 @@ function gcmNotifications (callback) {
 
     function processGCMNotifications (notifs) {
 	processNotifications(
-	    notifs, 
+	    notifs,
 	    callback, 
 	    GcmBatcher.sendPush
 	);

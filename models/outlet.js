@@ -5,6 +5,8 @@ var Account = mongoose.model('Account');
 
 var OutletSchema = new Schema({
     username: {type: String},
+    publicUrl: [{type: String}],
+    shortUrl: [{type: String}],
     basics : {
         name: {type: String, trim: true, required: true},
         slug: {type: String, trim: true, required: true, index: true},
@@ -51,10 +53,105 @@ var OutletSchema = new Schema({
         facebook_url: {type: String, default: ''},
         twitter_url: {type: String, default: ''},
         youtube_url: {type: String, default: ''},
+        zomato_url: {type: String, default: ''},
+        foodpanda_url: {type: String, default: ''},
         other_urls: [{
             link_name: {type: String, default: ''},
             link_url: {type: String, default: ''}
         }]
+    },
+    business_hours: {
+        sunday: {
+            closed: {type: Boolean, default: false},
+            timings: [{
+                open: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                },
+                close: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                }
+            }]
+        },
+        monday: {
+            closed: {type: Boolean, default: false},
+            timings: [{
+                open: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                },
+                close: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                }
+            }]
+        },
+        tuesday: {
+            closed: {type: Boolean, default: false},
+            timings: [{
+                open: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                },
+                close: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                }
+            }]
+        },
+        wednesday: {
+            closed: {type: Boolean, default: false},
+            timings: [{
+                open: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                },
+                close: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                }
+            }]
+        },
+        thursday: {
+            closed: {type: Boolean, default: false},
+            timings: [{
+                open: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                },
+                close: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                }
+            }]
+        },
+        friday: {
+            closed: {type: Boolean, default: false},
+            timings: [{
+                open: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                },
+                close: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                }
+            }]
+        },
+        saturday: {
+            closed: {type: Boolean, default: false},
+            timings: [{
+                open: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                },
+                close: {
+                    hr: {type: Number},
+                    min: {type: Number}
+                }
+            }]
+        }
     },
     attributes: {
         home_delivery: {type: Boolean},
@@ -100,6 +197,13 @@ var OutletSchema = new Schema({
             }
         ],
         recommend_list: [{type: Schema.ObjectId, ref: 'Outlet'}]
+    },
+    sms_off: {
+        value: {type: Boolean},
+        time: {
+            start: {type: Number, default: 23},
+            end: {type: Number, default: 9}
+        }
     }
 });
 

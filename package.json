@@ -1,19 +1,58 @@
 {
-    "dependencies": {
-        "mongoose": "latest",
-        "emailjs": "0.3.4",
-        "adm-zip": "latest",
-        "node-schedule": "latest",
-        "node-gcm": "~0.9.8",
-        "async": "latest",
-        "http-post": "~0.1.1"
-    },
-    "name": "twyst-data",
-    "scripts": {
-        "start": "node app.js"
-    },
-    "version": "0.0.1",
-    "engines": {
-        "node": "0.8.x"
-    }
+  "dependencies": {
+    "node-schedule": "latest",
+    "node-gcm": "~0.9.8",
+    "adm-zip": "~0.4.4",
+    "async": "latest",
+    "aws-sdk": "~1.13.0",
+    "body-parser": "latest",
+    "compression": "latest",
+    "connect-mongo": "latest",
+    "cookie-parser": "latest",
+    "csv": "^0.3.7",
+    "dateformat": "~1.0.7-1.2.3",
+    "easy-zip": "0.0.4",
+    "emailjs": "0.3.4",
+    "errorhandler": "latest",
+    "express": "latest",
+    "express-session": "latest",
+    "http-post": "~0.1.1",
+    "jade": "latest",
+    "memory-cache": "0.0.5",
+    "method-override": "latest",
+    "mongoose": "latest",
+    "mongoose-rbac": "~0.1.0",
+    "morgan": "latest",
+    "mstring": "^0.1.2",
+    "multer": "^0.1.0",
+    "node-gcm": "~0.9.8",
+    "nodemailer": "^1.0.4",
+    "passport": "latest",
+    "passport-facebook": "latest",
+    "passport-local": "latest",
+    "passport-local-mongoose": "latest",
+    "qrpng": "~0.1.1",
+    "restler": "^3.2.2",
+    "serve-favicon": "latest",
+    "string": "~1.8.0",
+    "superagent": "^0.19.0",
+    "underscore": "latest",
+    "validator": "^3.19.1"
+  },
+  "devDependencies": {
+    "mocha": "latest",
+    "chai": "latest",
+    "should": "latest",
+    "supertest": "latest"
+  },
+  "name": "twyst",
+  "subdomain": "twyst",
+  "scripts": {
+    "start": "node app.js",
+    "test": "mocha"
+  },
+  "version": "0.0.1",
+  "engines": {
+    "node": "0.8.x"
+  }
 }
