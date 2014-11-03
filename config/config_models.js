@@ -26,7 +26,8 @@ module.exports = function () {
         recco_config = require('../models/recco_config'),
         user_loc = require('../models/userLoc.js'),
         winback = require('../models/winback.js'),
-        beta_merchants = require('../models/beta_merchants');
+        beta_merchants = require('../models/beta_merchants'),
+        voucher_reminder = require('../models/voucher_reminder');
 
     mongoose.model('Account').schema.add({
         account: {type: Schema.ObjectId, ref: 'Account'}

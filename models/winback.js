@@ -12,7 +12,7 @@ var WinbackSchema = new Schema ({
         voucher_valid_days: {type: Number, default: 30} 
     },
     min_historical_checkins: {type: Number},
-    days_since_last_visit: {type: Number},
+    weeks_since_last_visit: {type: Number},
     messages: {
         sms: {type: String},
         push: {type: String},
