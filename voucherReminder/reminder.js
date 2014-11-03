@@ -5,9 +5,9 @@ var mongoose = require('mongoose');
 var Program = mongoose.model('Program');
 var Voucher = mongoose.model('Voucher');
 var VR = mongoose.model('VoucherReminder');
-mongoose.connect('mongodb://localhost/twyst');
+mongoose.connect('mongodb://50.112.253.131/twyst');
 var Processor = require('./processor');
-var job = schedule.scheduleJob({hour: 6, dayOfWeek: [new schedule.Range(0,6)]}, main);
+var job = schedule.scheduleJob({hour: 12, minute: 30, dayOfWeek: [new schedule.Range(0,6)]}, main);
 
 function main() {
 	getPrograms(function (err, programs) {
