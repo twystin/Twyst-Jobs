@@ -34,18 +34,14 @@ var Account = new Schema({
     },
     gcm: {type: String, default: ''},
     social_graph: {
-        provider: {
-            facebook: {
-
-            },
-            google: {
-
-            }
-        }
+        facebook: {},
+        google: {},
+        email: {}
     },
     device_id: {type: String, default: ''},
     otp_validated: Boolean,
     batch_user: {type: Boolean, default: false},
+    blacklisted: {type: Boolean, default: false},
     created_at: {type: Date, default: Date.now}
 });
 

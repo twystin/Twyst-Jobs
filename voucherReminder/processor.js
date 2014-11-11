@@ -44,7 +44,7 @@ function populateInfo(obj, cb) {
 			cb(err, null);
 		}
 		else {
-			if(user) {
+			if(user && !user.blacklisted) {
 				getVouchers(obj.vouchers, function (err, vouchers) {
 					if(err) {
 						cb(err, null);
