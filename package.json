@@ -1,7 +1,5 @@
 {
   "dependencies": {
-    "node-schedule": "latest",
-    "node-gcm": "~0.9.8",
     "adm-zip": "~0.4.4",
     "async": "latest",
     "aws-sdk": "~1.13.0",
@@ -16,6 +14,7 @@
     "errorhandler": "latest",
     "express": "latest",
     "express-session": "latest",
+    "gm": "^1.17.0",
     "http-post": "~0.1.1",
     "jade": "latest",
     "memory-cache": "0.0.5",
@@ -26,6 +25,7 @@
     "mstring": "^0.1.2",
     "multer": "^0.1.0",
     "node-gcm": "~0.9.8",
+    "node-schedule": "latest",
     "nodemailer": "^1.0.4",
     "passport": "latest",
     "passport-facebook": "latest",
