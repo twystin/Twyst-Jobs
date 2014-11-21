@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Notif = mongoose.model('Notif');
+var Unsbs = mongoose.model('Unsbs');
 var days = [ 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 var transports = {
@@ -10,19 +11,67 @@ var transports = {
 };
 
 module.exports.handleReminder = function (info) {
-	var transport = getUserTransport(info.user);
-	if(transport.CONSOLE) {
-		transports['CONSOLE'](info);
+	filterUnsbs(info, function (err, info) {
+		var transport = getUserTransport(info.user);
+		if(transport.CONSOLE) {
+			transports['CONSOLE'](info);
+		}
+		if(transport.EMAIL) {
+			transports['EMAIL'](info);
+		}
+		if(transport.PUSH) {
+			transports['PUSH'](info);
+		}
+		if(transport.SMS) {
+			transports['SMS'](info);
+		}
+	})
+}
+
+function filterUnsbs(info, cb) {
+	Unsbs.findOne({
+		user: info.user._id
+	}, function (err, unsbs) {
+		if(err) {
+			info.vouchers = [];
+			cb(err, info);
+		}
+		else {
+			if(unsbs) {
+				var vouchers = [];
+				info.vouchers.forEach(function (v) {
+					if(!isUnsbs(v, unsbs)) {
+						vouchers.push(v);
+					}
+				})
+				info.vouchers = vouchers;
+				cb(err, info);
+			}
+			else {
+				cb(err, info);
+			}
+		}
+	})
+}
+
+function isUnsbs(voucher, unsbs) {
+	for(var i = 0; i < unsbs.sms.remind.outlets.length; i++) {
+		if(isMatchedOutlet(voucher, unsbs.sms.remind.outlets[i])) {
+			return true;
+		}
 	}
-	if(transport.EMAIL) {
-		transports['EMAIL'](info);
+	return false;
+}
+
+function isMatchedOutlet(voucher, outlet) {
+	console.log(voucher)
+	console.log(outlet)
+	for(var i = 0; i < voucher.issue_details.issued_at.length; i++) {
+		if(voucher.issue_details.issued_at[i]._id.equals(outlet)) {
+			return true;
+		}
 	}
-	if(transport.PUSH) {
-		transports['PUSH'](info);
-	}
-	if(transport.SMS) {
-		transports['SMS'](info);
-	}
+	return false;
 }
 
 function getSmsMessage() {
@@ -49,7 +98,7 @@ function processSms(info) {
 	if(info.vouchers.length > 0) {
 		var v = pickVoucher(info.vouchers);
 		var push_message = 'Your Twyst Voucher for ' + rewardify(v.issue_details.issued_for) +', (TnC apply) at '+ v.issue_details.issued_at[0].basics.name +' is pending. Voucher code '+ v.basics.code +' - Redeem Today!';
-		push_message += ' Get the app (http://twy.st/app) to see all your '+ ((info.vouchers.length - 1) ? ((info.vouchers.length) + ' ') : '') +'vouchers.'
+		push_message += ' Click http://twy.st/' + v.issue_details.issued_at[0].shortUrl[0] + ' to see all rewards at ' + v.issue_details.issued_at[0].basics.name +'. To stop receiving this, sms STOP ' + v.issue_details.issued_at[0].shortUrl[0] +' to 9266801954.';
 		saveReminder(info.user.phone, push_message);
 	}
 }
@@ -95,7 +144,7 @@ function pickVoucher(vouchers) {
 		return null;
 	}
 	return vouchers[0];
-}
+} 
 
 function processConsole(info) {
 	if(info.vouchers.length > 1){
