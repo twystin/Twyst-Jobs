@@ -1,11 +1,15 @@
-var fs = require('fs');
-var schedule = require('node-schedule');
-var async = require('async');
+var fs = require('fs'),
+	_ = require('underscore'),
+	schedule = require('node-schedule'),
+	keygen = require("keygenerator"),
+	async = require('async');
 require('../config/config_models')();
 var mongoose = require('mongoose');
-var Winback = mongoose.model('Winback');
-var Outlet = mongoose.model('Outlet');
-var Checkin = mongoose.model('Checkin');
+var Voucher = mongoose.model('Voucher'),
+	Winback = mongoose.model('Winback'),
+	Outlet = mongoose.model('Outlet'),
+	Checkin = mongoose.model('Checkin'),
+	Account = mongoose.model('Account');
 
 mongoose.connect('mongodb://localhost/twyst');
 
@@ -18,16 +22,22 @@ function main() {
 		}
 		else {
 			if(winbacks && winbacks.length > 0) {
-				getAllOutlets(winbacks, function (err, objects) {
-					if(err) {
-						console.log("Error getting outlets.");
-					}
-					else {
-						getRefinedUsers(objects, function (err, users) {
-							//console.log(users)
-						})
-					}
-				}) 
+				async.each(winbacks, function (w, callback) {
+			        getUsers(w, function (err, users) {
+			        	if(err) {
+			        		callback(err);
+			        	}
+			        	else {
+			        		users = filterUsers(w, users);
+			        		console.log(users)
+			        		generateVouchers(w, users, function (err) {
+			        			callback(err);
+			        		});
+			        	}
+			        });
+			    }, function (err) {
+			        console.log("Done the winbacks");
+			    })
 			}
 			else {
 				console.log("No winbacks found currently.");
@@ -37,30 +47,93 @@ function main() {
 }
 main()
 
-function getRefinedUsers(objects, cb) {
-    async.each(objects, function (o, callback) {
-        getUsers(o, function (err, users) {
-        	if(err) {
-        		callback(err, users);
-        	}
-        	else {
-        		o.users = users;
-        		callback(null, users);
-        	}
+function filterUsers(winback, users) {
+	var filtered_users = [],
+		winback_filter_date_down = new Date(Date.now() - winback.weeks_since_last_visit * 7 * 86400000 - 86400000),
+		winback_filter_date_up = new Date(Date.now() - winback.weeks_since_last_visit * 7 * 86400000);
+	winback_filter_date_up = setHMS(winback_filter_date_up);
+	winback_filter_date_down = setHMS(winback_filter_date_down);
+	users.forEach(function (u) {
+		u.dates = _.sortBy(u.dates, function (d) {
+			return -d;
+		});
+		if(u.dates[0] < winback_filter_date_up 
+			&& u.dates[0] > winback_filter_date_down) {
+			//filtered_users.push(u);
+		}
+		if(u._id == '9871303236') {
+			filtered_users.push(u);
+		}
+	});
+	return filtered_users;
+}
+
+function setHMS(date) {
+	date.setHours(0);
+	date.setMinutes(0);
+	date.setSeconds(0);
+	return date;
+}
+
+function generateVouchers(winback, users, cb) {
+    async.each(users, function (u, callback) {
+        saveVoucher(u, winback, function (err) {
+        	callback(err);
         });
     }, function (err) {
-        cb(err, objects);
+        cb(err);
     })
 }
 
-function getUsers(obj, cb) {
+function saveVoucher(user, winback, cb) {
+	Account.findOne(function (err, user) {
+		if(err) {
+			cb(err);
+		}
+		else {
+			if(!user) {
+				cb();
+			}
+			else {
+				var voucher = {
+					basics: {
+						code: keygen._({
+							forceUppercase: true, 
+							length: 6, 
+							exclude:['O', '0', 'L', '1']
+						}),
+						description: winback.name,
+						type: 'WINBACK'
+					},
+					validity: {
+						start_date: Date.now(),
+				        end_date: winback.validity.voucher_valid_days * 86400000,
+				        number_of_days: winback.validity.voucher_valid_days
+					},
+					issue_details: {
+						winback: winback._id,
+						issued_for: winback.offers[0],
+						issued_at: winback.outlets.map(function (o) {
+							return o._id;
+						}),
+						issued_to: user._id
+					}
+				}
+
+				voucher = new Voucher(voucher);
+				voucher.save(function (err) {
+					cb(err);
+				})
+			}
+		}
+	})
+}
+
+function getUsers(winback, cb) {
 	Checkin.aggregate({
 		$match: {
-			checkin_date: {
-				$lt: new Date(Date.now() - 7 * obj.winback.weeks_since_last_visit * 86400000)
-			},
 			outlet: {
-				$in: obj.outlets.map(function (o) {
+				$in: winback.outlets.map(function (o) {
 					return mongoose.Types.ObjectId(o._id);
 				})
 			}
@@ -70,16 +143,18 @@ function getUsers(obj, cb) {
 			_id: '$phone',
 			count: {
 				$sum: 1
+			},
+			dates: {
+				$push: '$checkin_date'
 			}
 		}
 	}, {
 		$match: {
 			count: {
-				$gt: obj.winback.min_historical_checkins
+				$gt: winback.min_historical_checkins
 			}
 		}
 	}, function (err, op) {
-		console.log(err || op)
 		cb(err, op);
 	})
 }
@@ -119,12 +194,15 @@ function getWinbacks(cb) {
 	Winback.find({
 		'status': 'active',
 		'validity.earn_start': {
-			$lt: new Date()
+			$lt: new Date(),
 		},
 		'validity.earn_end': {
-			$gt: new Date()
-		},
-	}, function (err, winbacks) {
+			$gt: new Date(),
+		}
+	})
+	.populate('outlets')
+	.populate('offers')
+	.exec(function (err, winbacks) {
 		cb(err, winbacks);
 	})
 }

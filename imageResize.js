@@ -48,7 +48,6 @@ function resizer(image_path, dimension, cb) {
 		else {
 			im.resize(resize_object, function(err, stdout, stderr){
 				var image_buffer = new Buffer(stdout, "binary");
-				console.log(image_buffer);
 				cb(err, image_buffer);
 			});
 		}

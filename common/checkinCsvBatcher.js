@@ -4,11 +4,12 @@ var fs = require("fs");
 readCsv(0)
 function readCsv(data_index) {
 	csv()
-	.from.stream(fs.createReadStream(__dirname + '/0.csv', { encoding: 'utf8' }))
+	.from.stream(fs.createReadStream(__dirname + '/la_2000.csv', { encoding: 'utf8' }))
 	.on('record', function (row, index) {
-	    if (index === data_index) {
-	    	httpCheckin(index, row[0]);
-	    }
+		console.log(row[0])
+	    // if (index === data_index) {
+	    // 	httpCheckin(index, row[0]);
+	    // }
 	})
 	.on('end', function (count) {
 		console.log("I am finished.")
