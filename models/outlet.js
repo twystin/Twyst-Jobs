@@ -8,6 +8,12 @@ var OutletSchema = new Schema({
     username: {type: String},
     publicUrl: [{type: String}],
     shortUrl: [{type: String}],
+    ny_2015: {
+        featured: {type: Boolean, default: false},
+        on_twyst: {type: String, trim: true},
+        off_twyst: {type: String, trim: true},
+        desc: {type: String, trim: true}
+    },
     basics : {
         name: {type: String, trim: true, required: true},
         slug: {type: String, trim: true, required: true, index: true},
@@ -15,8 +21,8 @@ var OutletSchema = new Schema({
         merchant_name: {type: String, default: ''},
         contact_person_name: {type: String, default: ''},
         size: {type: String, default: '', trim: true}, // size of the establishament
-        is_a: {type: String, enum: ['restaurant','biryani','chinese','conntinental','north_indian','fast_food','burgers','pizza','wraps','pub','beer','bakery','cake','cafe','bistro','takeaway','other']},
-        icon: {type: String, enum: ['restaurant','biryani','chinese','conntinental','north_indian','fast_food','burgers','pizza','wraps','pub','beer','bakery','cake','cafe','bistro','takeaway','other']},
+        is_a: {type: String, enum: ['desserts', 'restaurant','biryani','chinese','conntinental','north_indian','fast_food','burgers','pizza','wraps','pub','beer','bakery','cake','cafe','bistro','takeaway','other']},
+        icon: {type: String, enum: ['desserts', 'restaurant','biryani','chinese','conntinental','north_indian','fast_food','burgers','pizza','wraps','pub','beer','bakery','cake','cafe','bistro','takeaway','other']},
         franchise: {type: Boolean},
         images: [{type: String}],
         created_at : {type: Date, default: Date.now},
@@ -102,7 +108,8 @@ var OutletSchema = new Schema({
     outlet_meta: {
         accounts: [{type: Schema.ObjectId, ref: 'Account'}],
         status: {type: String, enum: ['active', 'archived', 'draft'], default: 'draft'},
-        links: [{type: Schema.ObjectId, ref: 'Outlet'}]
+        links: [{type: Schema.ObjectId, ref: 'Outlet'}],
+        featured: {type: Boolean, default: false}
     },
     twyst_meta: {
         rating: {
