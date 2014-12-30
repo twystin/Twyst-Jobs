@@ -9,7 +9,7 @@ var Voucher = mongoose.model('Voucher'),
 	Checkin = mongoose.model('Checkin'),
 	Account = mongoose.model('Account');
 
-var Filter = require('./filter');
+var Filter = require('./filter'); 
 
 mongoose.connect('mongodb://localhost/twyst');
 

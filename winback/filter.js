@@ -97,7 +97,7 @@ function getVoucherObject(winback, user) {
 	return voucher;
 }
 
-function filterByDate(winback, users) {
+function filterByDate(winback, users) { 
 	var filtered_users = [];
 	var date_since_last_visit = setHMS(winback.date_since_last_visit, 23, 59, 59);
 	users.forEach(function (u) {
