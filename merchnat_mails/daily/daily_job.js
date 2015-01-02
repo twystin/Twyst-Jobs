@@ -14,7 +14,7 @@ var months = ["January","February","March","April","May","June","July","August",
 //main()
 var job = schedule.scheduleJob({hour: 6, minute: 30, dayOfWeek: [new schedule.Range(0,6)]}, main)
 function main() {
-	console.log("jf")
+	console.log("The job starts for today: " + new Date());
 	getOutlets(function (err, outlets) {
 		if(err) {
 			console.log(new Date());
@@ -256,6 +256,9 @@ function getMerchant(accounts, cb) {
 
 function getOutlets(cb) {
 	Outlet.find({
+		'basics.slug': {
+			$ne: 'biryaniblues'
+		},
 		'outlet_meta.status': 'active'
 	})
 	.select('basics outlet_meta shortUrl contact.location.locality_1')
