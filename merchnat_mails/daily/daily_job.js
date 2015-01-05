@@ -256,9 +256,6 @@ function getMerchant(accounts, cb) {
 
 function getOutlets(cb) {
 	Outlet.find({
-		'basics.slug': {
-			$ne: 'biryaniblues'
-		},
 		'outlet_meta.status': 'active'
 	})
 	.select('basics outlet_meta shortUrl contact.location.locality_1')
