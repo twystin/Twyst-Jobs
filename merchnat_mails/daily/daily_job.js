@@ -145,7 +145,16 @@ function getMonthlyUserData(outlet_id, q, cb) {
 				cb(err, data);
 			}
 			else {
-				getRepeatUsersCount(phones, q, function (err, count) {
+				query = {
+					outlet: outlet_id,
+					checkin_date: {
+						$gt: q.first_date_of_month
+					},
+					phone: {
+						$in: phones
+					}
+				};
+				getRepeatUsersCount(query, function (err, count) {
 					if(err) {
 						cb(err, data);
 					}
@@ -160,15 +169,8 @@ function getMonthlyUserData(outlet_id, q, cb) {
 	})
 }
 
-function getRepeatUsersCount(phones, q, cb) {
-	Checkin.find({
-		checkin_date: {
-			$lt: q.first_date_of_month
-		},
-		phone: {
-			$in: phones
-		}
-	}).distinct('phone', function (err, phones) {
+function getRepeatUsersCount(query, cb) {
+	Checkin.find(query).distinct('phone', function (err, phones) {
 		cb(err, phones ? phones.length : 0);
 	});
 }
