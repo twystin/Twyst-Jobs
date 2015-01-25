@@ -148,7 +148,7 @@ function getMonthlyUserData(outlet_id, q, cb) {
 				query = {
 					outlet: outlet_id,
 					checkin_date: {
-						$gt: q.first_date_of_month
+						$lt: q.first_date_of_month
 					},
 					phone: {
 						$in: phones
