@@ -33,11 +33,10 @@ function smsNotifications () {
     );
 }
 
-function getNotifications(begin, end, status, callback) {
+function getNotifications(end, status, callback) {
     Notif.find({
 		message_type: "SMS",
 		scheduled_at: {
-		    $gte: begin,
 		    $lte: end
 		},
 		status: status

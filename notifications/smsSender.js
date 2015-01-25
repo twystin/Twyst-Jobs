@@ -3,6 +3,7 @@ var http = require('http');
 
 module.exports.sendBulkSMS = function(item) {
     var body = "";
+    var from = item.from || 'TWYSTR'
     message = item.body;
     message = message.replace(/(\n)+/g, '');    
     message = message.replace(/&/g,'%26');
@@ -10,7 +11,7 @@ module.exports.sendBulkSMS = function(item) {
     phones = item.phones.join(',');
     var send_sms_url = sms_push_url + 
 	phones + 
-	"&from=TWYSTR&text=" +
+	"&from=" + from + "&text=" +
 	message +
 	"&category=bulk";
 
