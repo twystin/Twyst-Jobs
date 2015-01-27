@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var voucher = require('../models/voucher');
 var Voucher = mongoose.model('Voucher');
-mongoose.connect('mongodb://localhost/twyst');
+mongoose.connect('mongodb://50.112.253.131/twyst');
 
 var job = schedule.scheduleJob({minute: 38, dayOfWeek: [new schedule.Range(0,6)]}, main);
 
