@@ -11,10 +11,10 @@ var Voucher = mongoose.model('Voucher'),
 
 var Filter = require('./filter'); 
 
-mongoose.connect('mongodb://localhost/twyst');
+mongoose.connect('mongodb://50.112.253.131/twyst');
 
 var job = schedule.scheduleJob({minute: 38, dayOfWeek: [new schedule.Range(0,6)]}, main);
-
+main();
 function main() {
 	getWinbacks(function (err, winbacks) {
 		if(err) {
@@ -50,8 +50,7 @@ function main() {
 			}
 		}
 	})
-}
-main()
+};
 
 function getUsers(winback, cb) {
 	Checkin.aggregate({
