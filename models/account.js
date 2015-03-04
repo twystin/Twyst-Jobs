@@ -18,6 +18,7 @@ var Account = new Schema({
     parent: String, //The logged in user which creates the restricted users
     reset_password_token: String,
     remember: String,
+    birthday: {type : Date},
     validated: {
         role_validated: Boolean,
         email_validated: {
@@ -37,6 +38,22 @@ var Account = new Schema({
         facebook: {},
         google: {},
         email: {}
+    },
+    profile: {
+        first_name: {type: String, default: ""},
+        middle_name: {type: String, default: ""},
+        last_name: {type: String, default: ""},
+        email: {type: String},
+        bday: {
+            d: {type: Number},
+            m: {type: Number},
+            y: {type: Number}
+        },
+        anniv: {
+            d: {type: Number},
+            m: {type: Number},
+            y: {type: Number}
+        }
     },
     device_id: {type: String, default: ''},
     otp_validated: Boolean,
