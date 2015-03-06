@@ -14,6 +14,7 @@ var Special = mongoose.model('SpecialProgram'),
 main();
 
 function main() {
+    var days = null;
     getSpecialPrograms(function(err, specials) {
         if (err) {
             console.log("Error getting specials. " + new Date());
@@ -25,10 +26,14 @@ function main() {
                             if (err) {
                                 callback(err);
                             } else {
-                                getAccounts(users, function(a) {
-                                	if (a !== undefined) {
-	                                	console.log(a);
-                                	}
+                                days = (w.validity &&
+                                    w.validity.send_at &&
+                                    w.validity.send_at.days_before) || 7;
+                                getAccounts(users, days, function(a) {
+                                    if (a !== undefined) {
+                                        console.log("Matching user found!");
+                                        console.log(a);
+                                    }
                                 })
                             }
                         });
@@ -85,21 +90,36 @@ function getUsers(special, cb) {
     })
 }
 
-function getAccounts(users, cb) {
+function getAccounts(users, days, cb) {
+    var birthday = null;
+    var delta = 0;
+    var jobdate = new Date();
     async.each(users, function(u, callback) {
         if (u._id) {
             Account.findOne({
                 phone: u._id,
-                'profile.bday.d': {$ne:null}
+                'profile.bday.d': {
+                    $ne: null
+                },
+                'profile.bday.m': {
+                    $ne: null
+                }
             }, function(err, user) {
                 if (err) {
-                	console.log("Error finding the account");
+                    //console.log("Error finding the account");
                 } else {
-                	if (user) {
-                		cb(user);
-                	} else {
-                		//console.log("Account is null");
-                	}
+                    if (user) {
+                        // Should not hard code this to 2015.
+                        birthday = new Date(2015, user.profile.bday.m - 1, user.profile.bday.d);
+                        delta = birthday.getTime() - jobdate.getTime();
+                        if (delta < days * 24 * 60 * 60 * 1000 && delta > 0) {
+                            //console.log(birthday);
+                            //console.log("Matching date found!!");
+                            cb(user);
+                        }
+                    } else {
+                        //console.log("Account is null");
+                    }
                 }
             })
         } else {
