@@ -9,30 +9,40 @@ require('../models/specialProgram.js');
 var Special = mongoose.model('SpecialProgram'),
     Outlet = mongoose.model('Outlet'),
     Checkin = mongoose.model('Checkin'),
-    Account = mongoose.model('Account');
+    Account = mongoose.model('Account'),
+    Voucher = mongoose.model('Voucher'),
+    keygen = require("keygenerator");
 
 main();
 
 function main() {
     var days = null;
-    getSpecialPrograms(function(err, specials) {
+    getOutletsRunningSpecialPrograms(function(err, specials) {
         if (err) {
             console.log("Error getting specials. " + new Date());
         } else {
             if (specials && specials.length > 0) {
                 async.each(specials, function(w, callback) {
                     if (w.outlets.length > 0) {
-                        getUsers(w, function(err, users) {
+                        findUsersWithCheckinsAtThisOutlet(w, function(err, users) {
                             if (err) {
                                 callback(err);
                             } else {
                                 days = (w.validity &&
                                     w.validity.send_at &&
                                     w.validity.send_at.days_before) || 7;
-                                getAccounts(users, days, function(a) {
-                                    if (a !== undefined) {
+                                getUsersWithBirthdayInTheHorizon(users, days, function(u, c) {
+                                    if (u !== undefined) {
                                         console.log("Matching user found!");
-                                        console.log(a);
+                                        console.log(u);
+                                        console.log("SPECIAL");
+                                        console.log(w);
+                                        console.log("COUNT")
+                                        console.log(c);
+                                        saveVoucher(u, w, function(v) {
+                                            console.log(v);
+                                        });
+                                        //createVoucherForThisUser();
                                     }
                                 })
                             }
@@ -54,7 +64,7 @@ function main() {
     });
 }
 
-function getSpecialPrograms(cb) {
+function getOutletsRunningSpecialPrograms(cb) {
     // Do some filtering here.
     Special.find({})
         .populate('outlets')
@@ -63,7 +73,7 @@ function getSpecialPrograms(cb) {
         })
 }
 
-function getUsers(special, cb) {
+function findUsersWithCheckinsAtThisOutlet(special, cb) {
     Checkin.aggregate({
         $match: {
             outlet: {
@@ -90,7 +100,7 @@ function getUsers(special, cb) {
     })
 }
 
-function getAccounts(users, days, cb) {
+function getUsersWithBirthdayInTheHorizon(users, days, cb) {
     var birthday = null;
     var delta = 0;
     var jobdate = new Date();
@@ -115,7 +125,7 @@ function getAccounts(users, days, cb) {
                         if (delta < days * 24 * 60 * 60 * 1000 && delta > 0) {
                             //console.log(birthday);
                             //console.log("Matching date found!!");
-                            cb(user);
+                            cb(user, u.count);
                         }
                     } else {
                         //console.log("Account is null");
@@ -126,4 +136,50 @@ function getAccounts(users, days, cb) {
             console.log("Couldn't find the user!")
         }
     })
+}
+
+function saveVoucher(user, special, cb) {
+    var voucher = getVoucherObject(special, user);
+    voucher = new Voucher(voucher);
+    cb(voucher);
+    // voucher.save(function (err) {
+    //     cb(err, voucher);
+    // })
+}
+
+function getVoucherObject(special, user) {
+    var voucher = {
+        basics: {
+            code: keygen._({
+                forceUppercase: true, 
+                length: 6, 
+                exclude:['O', '0', 'L', '1']
+            }),
+            type: 'BIRTHDAY',
+            description: special.desc
+        },
+        validity: {
+            start_date: new Date(),
+            end_date: new Date(),
+            //number_of_days: winback.validity.voucher_valid_days
+        },
+        issue_details: {
+            // winback: winback._id,
+            birthday: special._id,
+            issued_at: special.outlets.map(function (o) {
+                return o._id;
+            }),
+            issued_to: user._id
+        }
+    }
+    // voucher.validity.end_date = new Date(voucher.validity.end_date);
+    // voucher.validity.end_date = setHMS(voucher.validity.end_date, 23, 59, 59);
+    return voucher;
+}
+
+function setHMS(date, h, m, s) {
+    date.setHours(h || 0);
+    date.setMinutes(m || 0);
+    date.setSeconds(s || 0);
+    return date;
 }

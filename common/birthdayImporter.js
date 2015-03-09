@@ -5,7 +5,7 @@ var account = require('../models/account.js');
 var mongoose = require('mongoose');
 var Account = mongoose.model('Account');
 
-mongoose.connect('mongodb://localhost/twyst');
+mongoose.connect('mongodb://50.112.253.131/twyst');
 
 csv()
 	.from.stream(fs.createReadStream(__dirname + '/birthdays.csv', { encoding: 'utf8' }))
