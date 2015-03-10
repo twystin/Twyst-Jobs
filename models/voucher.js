@@ -25,7 +25,8 @@ var VoucherSchema = new Schema({
         program: {type: Schema.ObjectId, ref: 'Program'},
         tier: {type: Schema.ObjectId, ref: 'Tier'},
         issued_for: {type: Schema.ObjectId, ref: 'Offer'},
-        winback: {type: Schema.ObjectId, ref: 'Winback'}
+        winback: {type: Schema.ObjectId, ref: 'Winback'},
+        birthday: {type: Schema.ObjectId, ref: 'SpecialProgram'}
     },
     used_details: {
         used_by: {type: Schema.ObjectId, ref: 'Account'},

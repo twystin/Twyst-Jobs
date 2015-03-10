@@ -14,7 +14,7 @@ var Special = mongoose.model('SpecialProgram'),
     keygen = require("keygenerator");
 
 main();
-
+//
 function main() {
     var days = null;
     getOutletsRunningSpecialPrograms(function(err, specials) {
@@ -160,11 +160,10 @@ function getVoucherObject(special, user) {
         },
         validity: {
             start_date: new Date(),
-            end_date: new Date(),
+            end_date: special.validity.earn_end,
             //number_of_days: winback.validity.voucher_valid_days
         },
         issue_details: {
-            // winback: winback._id,
             birthday: special._id,
             issued_at: special.outlets.map(function (o) {
                 return o._id;
@@ -172,8 +171,8 @@ function getVoucherObject(special, user) {
             issued_to: user._id
         }
     }
-    // voucher.validity.end_date = new Date(voucher.validity.end_date);
-    // voucher.validity.end_date = setHMS(voucher.validity.end_date, 23, 59, 59);
+    voucher.validity.end_date = new Date(voucher.validity.end_date);
+    voucher.validity.end_date = setHMS(voucher.validity.end_date, 23, 59, 59);
     return voucher;
 }
 
