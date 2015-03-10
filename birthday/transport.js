@@ -31,9 +31,7 @@ function processSms(user, winback, voucher) {
 		winback.outlets[0].contact.phones.mobile[0].num : 
 		winback.outlets[0].contact.phones.landline);
 	var push_message = "Birthday wishes from " + winback.outlets[0].basics.name +"! We have a little something for you – " + rewardify(winback) + " - when you visit next. Voucher code "+ voucher.basics.code +" (valid till "+ Utils.formatDate(voucher.validity.end_date) +"). To claim, just show this to your server. See you soon! Call "+ outlet_phone +" to reserve/order.";
-	console.log(winback.ranges);
-	console.log(push_message);
-	//saveReminder(user.phone, push_message, winback.validity.send_voucher_at); 
+	saveReminder(user.phone, push_message, winback.validity.send_at.at_hours); 
 }
 
 function processConsole() {
@@ -50,15 +48,15 @@ function processEmail() {
 
 function saveReminder(phone, message, send_voucher_at) {
 	var notif = getNotifObject(phone, message, send_voucher_at);
-
-	notif.save(function (err) {
-		if(err) {
-			console.log(err);
-		}
-		else {
-			console.log("Saved notif");
-		}
-	});
+	console.log(notif);
+	// notif.save(function (err) {
+	// 	if(err) {
+	// 		console.log(err);
+	// 	}
+	// 	else {
+	// 		console.log("Saved notif");
+	// 	}
+	// });
 }
 
 function getNotifObject(phone, message, send_voucher_at) {
