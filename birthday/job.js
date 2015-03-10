@@ -11,10 +11,11 @@ var Special = mongoose.model('SpecialProgram'),
     Checkin = mongoose.model('Checkin'),
     Account = mongoose.model('Account'),
     Voucher = mongoose.model('Voucher'),
-    keygen = require("keygenerator");
+    keygen = require("keygenerator"),
+    Transport = require('./transport');
 
 main();
-//
+
 function main() {
     var days = null;
     getOutletsRunningSpecialPrograms(function(err, specials) {
@@ -33,14 +34,14 @@ function main() {
                                     w.validity.send_at.days_before) || 7;
                                 getUsersWithBirthdayInTheHorizon(users, days, function(u, c) {
                                     if (u !== undefined) {
-                                        console.log("Matching user found!");
-                                        console.log(u);
-                                        console.log("SPECIAL");
-                                        console.log(w);
-                                        console.log("COUNT")
-                                        console.log(c);
+                                        // console.log("Matching user found!");
+                                        // console.log(u);
+                                        // console.log("SPECIAL");
+                                        // console.log(w);
+                                        // console.log("COUNT")
+                                        // console.log(c);
                                         saveVoucher(u, w, function(v) {
-                                            console.log(v);
+                                            Transport.handleMessage(u, w, v);
                                         });
                                         //createVoucherForThisUser();
                                     }
