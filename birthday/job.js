@@ -34,16 +34,9 @@ function main() {
                                     w.validity.send_at.days_before) || 7;
                                 getUsersWithBirthdayInTheHorizon(users, days, function(u, c) {
                                     if (u !== undefined) {
-                                        // console.log("Matching user found!");
-                                        // console.log(u);
-                                        // console.log("SPECIAL");
-                                        // console.log(w);
-                                        // console.log("COUNT")
-                                        // console.log(c);
                                         saveVoucher(u, w, function(v) {
                                             Transport.handleMessage(u, w, v);
                                         });
-                                        //createVoucherForThisUser();
                                     }
                                 })
                             }
@@ -142,10 +135,9 @@ function getUsersWithBirthdayInTheHorizon(users, days, cb) {
 function saveVoucher(user, special, cb) {
     var voucher = getVoucherObject(special, user);
     voucher = new Voucher(voucher);
-    cb(voucher);
-    // voucher.save(function (err) {
-    //     cb(err, voucher);
-    // })
+    voucher.save(function (err) {
+        cb(err, voucher);
+    })
 }
 
 function getVoucherObject(special, user) {
