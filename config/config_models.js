@@ -8,8 +8,8 @@ module.exports = function () {
         'account', 'offer', 'outlet', 'program', 'voucher', 'tier', 'recommendation',
         'checkin', 'favourite', 'qr_code', 'tag', 'beta_users', 'log', 'smslog',
         'smsMessageSentLogs', 'redirect', 'temp_otp', 'notif', 'social', 'rating',
-        'recco_config', 'userLoc', 'rewards', 'winback', 'beta_merchants', 'group_program', 
-        'feedback', 'unsbs', 'voucher_reminder'
+        'recco_config', 'userLoc', 'rewards', 'winback', 'beta_merchants', 'group_program',
+        'feedback', 'unsbs', 'voucher_reminder', 'specialProgram'
     ];
 
     models.forEach(function (m) {
