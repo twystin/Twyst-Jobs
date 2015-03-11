@@ -34,8 +34,13 @@ function main() {
                                     w.validity.send_at.days_before) || 7;
                                 getUsersWithBirthdayInTheHorizon(users, days, function(u, c) {
                                     if (u !== undefined) {
-                                        saveVoucher(u, w, function(v) {
-                                            Transport.handleMessage(u, w, v);
+                                        saveVoucher(u, w, function(err, v) {
+                                            if (err) {
+                                                console.log(err);
+                                            } else {
+                                                console.log(v);
+                                                Transport.handleMessage(u, w, v);
+                                            }
                                         });
                                     }
                                 })
@@ -60,7 +65,7 @@ function main() {
 
 function getOutletsRunningSpecialPrograms(cb) {
     // Do some filtering here.
-    Special.find({})
+    Special.find({'status':'active'})
         .populate('outlets')
         .exec(function(err, specials) {
             cb(err, specials);
