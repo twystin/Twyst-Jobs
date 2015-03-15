@@ -1,6 +1,3 @@
-// Arun Rajappa
-// 11th March 2015
-
 var mongoose = require('mongoose');
 var async = require('async');
 require('../config/config_models')();

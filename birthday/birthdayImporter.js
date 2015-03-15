@@ -10,7 +10,6 @@ mongoose.connect('mongodb://50.112.253.131/twyst');
 csv()
 	.from.stream(fs.createReadStream(__dirname + '/birthdays.csv', { encoding: 'utf8' }))
 	.on('record', function (row, index) {
-		//console.log(row[4], row[7], row[6], row[5], new Date(row[7], row[6]-1, row[5]))
 	    if (index === 1) {
 	    	Account.findOne({phone:row[4]}, function(e,a) {
 	    	if (e) {
@@ -35,7 +34,7 @@ csv()
 	    	}
 	    })
 	    }
-	    
+
 	})
 	.on('end', function (count) {
 		//console.log("I am finished.")
