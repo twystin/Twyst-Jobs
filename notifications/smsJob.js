@@ -12,6 +12,7 @@ mongoose.connect('mongodb://50.112.253.131/twyst');
 
 var job = schedule.scheduleJob({minute: 38, dayOfWeek: [new schedule.Range(0,6)]}, smsNotifications);
 
+smsNotifications();
 function smsNotifications () {
     getNotifications(
 		new Date(Date.now() - 30 * 60 * 1000), 
@@ -33,7 +34,7 @@ function smsNotifications () {
     );
 }
 
-function getNotifications(end, status, callback) {
+function getNotifications(start, end, status, callback) {
     Notif.find({
 		message_type: "SMS",
 		scheduled_at: {

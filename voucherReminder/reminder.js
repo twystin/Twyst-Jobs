@@ -62,7 +62,7 @@ function getFilterQuery() {
 			$lt: getRealDate(13)
 		},
 		'validity': {
-			$lt: new Date(Date.now() + 14 * 86400000).setHours(0, 0, 1)
+			$gte: new Date(Date.now()).setHours(0, 0, 1)
 		}
 	};
 
