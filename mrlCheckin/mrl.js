@@ -10,18 +10,23 @@ var Voucher = mongoose.model('Voucher');
 var outletHandle = require('./outletHandles');
 mongoose.connect('mongodb://localhost/twyst');
 var file_name, config;
-fs.readdir('./newCheckin', function (err, fileName) {
-  if (err) throw err;
-  file_name = fileName;
-  setFileName(file_name);
+fs.readdir('../../Dropbox/MRL/', function (err, fileName) {
+  	if (err) throw err;
+  	var source = fs.createReadStream('../../Dropbox/MRL/' + fileName);
+	var dest = fs.createWriteStream('MRL/'+ fileName);			
+	source.pipe(dest);
+	source.on('end', function() { console.log('moved') });
+	source.on('error', function(err) { console.log(err)});
+  	file_name = fileName;
+  	setFileName(file_name);
 });
 var job = schedule.scheduleJob({minute: 25, dayOfWeek: [new schedule.Range(0,6)]}, initCheckin);
 
 function setFileName(file_name) {
 	config = {
-		'csv_file_name': __dirname + '/newCheckin/' + file_name, // File path which has phone numbers
+		'csv_file_name': __dirname + '/MRL/' + file_name, // File path which has phone numbers
 		'checkin_url': 'http://localhost:3000/api/v1/mrl_checkins' // Checkin API
-	}; // Message must have xxxxxx (To replace with voucher code)	
+	}; 
 }
 
 
@@ -36,12 +41,16 @@ function initCheckin() {
 				callback();
 			});
 		}, function (err) {
-			var source = fs.createReadStream('./newCheckin/' + file_name);
-			var dest = fs.createWriteStream('./processedFile/'+ new Date()+'.csv');			
+			var source = fs.createReadStream('MRL/' + file_name);
+			var dest = fs.createWriteStream('../../Dropbox/Checkin/'+ file_name);			
 			source.pipe(dest);
 			source.on('end', function() { console.log('moved') });
 			source.on('error', function(err) { console.log(err)});
-			fs.unlink('./newCheckin/' + file_name, function(er) {
+			fs.unlink('MRL/' + file_name, function(er) {
+				if(err) console.log(err)
+				console.log('removed successfully');
+			})
+			fs.unlink('../../Dropbox/MRL/' + file_name, function(er) {
 				if(err) console.log(err)
 				console.log('removed successfully');
 			})
@@ -67,16 +76,16 @@ function getDataFromFile(file_name, cb) {
 	.from
 	.stream(fs.createReadStream(file_name, { encoding: 'utf8' }))
 	.on('record', function (row, index) {
-		var outlet = _.find(outletHandle.handles,  function(item){ 		
-			if(item.mid.toString() === row[0].toString()) {
+		var outlet = _.find(outletHandle.handles,  function(item){ 	
+			if(item.mid.toString() === row[0].toString().replace("'", '')) {
 				return item.outlet;
 			}
 		})	
 		if(outlet && row[5]) {
 			checkin_details = {
-				'txn_time': row[5],
-				'phone': row[6],
-				'outlet': outlet.outlet,
+				'txn_time': row[5].replace("'", ''),
+				'phone': row[6].replace("'", ''),
+				'outlet': outlet.outlet.replace("'", ''),
 				'location': 'DINE_IN'
 			}
 			//console.log(checkin_details)
