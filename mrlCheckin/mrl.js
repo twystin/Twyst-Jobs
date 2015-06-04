@@ -12,13 +12,21 @@ mongoose.connect('mongodb://localhost/twyst');
 var file_name, config;
 fs.readdir('../../Dropbox/MRL/', function (err, fileName) {
   	if (err) throw err;
-  	var source = fs.createReadStream('../../Dropbox/MRL/' + fileName);
-	var dest = fs.createWriteStream('MRL/'+ fileName);			
-	source.pipe(dest);
-	source.on('end', function() { console.log('moved') });
-	source.on('error', function(err) { console.log(err)});
-  	file_name = fileName;
-  	setFileName(file_name);
+  	console.log(fileName + 'okokok')
+  	if(fileName != '') {
+  		var source = fs.createReadStream('../../Dropbox/MRL/' + fileName);
+		var dest = fs.createWriteStream('MRL/'+ fileName);			
+		source.pipe(dest);
+		source.on('end', function() { console.log('moved') });
+		source.on('error', function(err) { console.log(err)});
+	  	file_name = fileName;
+	  	setFileName(file_name);	
+	  	setTimeout(function(){ initCheckin(); }, 1000);
+  	}
+  	else {
+  		console.log('no file to checkin today ' + new Date());
+  	}
+  	
 });
 var job = schedule.scheduleJob({minute: 25, dayOfWeek: [new schedule.Range(0,6)]}, initCheckin);
 
@@ -30,7 +38,7 @@ function setFileName(file_name) {
 }
 
 
-setTimeout(function(){ initCheckin(); }, 1000);
+
 
 function initCheckin() {
 	getDataFromFile(config.csv_file_name, function (all_users) {
@@ -48,15 +56,15 @@ function initCheckin() {
 			source.on('error', function(err) { console.log(err)});
 			fs.unlink('MRL/' + file_name, function(er) {
 				if(err) console.log(err)
-				console.log('removed successfully');
+				console.log('removed  file from mrlCheckin/MRL folder successfully ');
 			})
 			fs.unlink('../../Dropbox/MRL/' + file_name, function(er) {
 				if(err) console.log(err)
-				console.log('removed successfully');
+				console.log('removed  file from DropBOX/MRL folder successfully');
 			})
 
 			console.log('---------------------------------------');
-			console.log(err || 'Completed Batch checkin process at '+ new Date());
+			console.log(err || 'Completed MRL checkin process at '+ new Date());
 		});
 	});
 };
