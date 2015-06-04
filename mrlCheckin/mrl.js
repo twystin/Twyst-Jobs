@@ -56,11 +56,11 @@ function initCheckin() {
 			source.on('error', function(err) { console.log(err)});
 			fs.unlink('MRL/' + file_name, function(er) {
 				if(err) console.log(err)
-				console.log('removed successfully');
+				console.log('removed  file from mrlCheckin/MRL folder successfully ');
 			})
 			fs.unlink('../../Dropbox/MRL/' + file_name, function(er) {
 				if(err) console.log(err)
-				console.log('removed successfully');
+				console.log('removed  file from DropBOX/MRL folder successfully');
 			})
 
 			console.log('---------------------------------------');
