@@ -28,7 +28,7 @@ fs.readdir('../../Dropbox/MRL/', function (err, fileName) {
   	}
   	
 });
-var job = schedule.scheduleJob({minute: 25, dayOfWeek: [new schedule.Range(0,6)]}, initCheckin);
+var job = schedule.scheduleJob({hour: 6, minute: 25, dayOfWeek: [new schedule.Range(0,6)]}, initCheckin);
 
 function setFileName(file_name) {
 	config = {
@@ -68,7 +68,8 @@ function initCheckin() {
 		});
 	});
 };
-
+VoucherReminder/reminder.js
+birthday/job.js
 function httpCheckin (user, cb) {
 	rest.post(config.checkin_url, {
 		data: user

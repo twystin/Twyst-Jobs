@@ -19,6 +19,7 @@ var Special = mongoose.model('SpecialProgram'),
     if (err) {
       console.log("Error getting special programs " + new Date());
     } else {
+      console.log('running job at ' + new Date() + specials)
       processSpecialPrograms(specials);
     }
   });
@@ -117,7 +118,7 @@ function getUsersWithBirthdayInTheHorizon(users, days, cb) {
         }
       }, function(err, user) {
         if (err) {
-          //console.log("Error finding the account");
+          console.log("Error finding the account");
         } else {
           if (user) {
             // Should not hard code this to 2015.
@@ -127,7 +128,7 @@ function getUsersWithBirthdayInTheHorizon(users, days, cb) {
               cb(user, u.count);
             }
           } else {
-            //console.log("Account is null");
+            console.log("Account is null");
           }
         }
       })
@@ -141,20 +142,20 @@ function saveVoucher(user, special, cb) {
   var voucher = getVoucherObject(special, user);
   voucher = new Voucher(voucher);
   voucher.save(function(err) {
-    cb(err, voucher);
+    cb(err, user, special, voucher);
   })
 }
 
-function sendMessage(err,v) {
+function sendMessage(err, u, w, v) {
     if (err) {
       console.log(err);
     } else {
-      console.log(v);
       Transport.handleMessage(u, w, v);
     }
 }
 
 function getVoucherObject(special, user) {
+  //console.log(JSON.stringify(special))
   var voucher = {
     basics: {
       code: keygen._({
@@ -163,7 +164,7 @@ function getVoucherObject(special, user) {
         exclude: ['O', '0', 'L', '1']
       }),
       type: 'BIRTHDAY',
-      description: special.desc
+      description: Transport.rewardify(special)
     },
     validity: {
       start_date: new Date(),
