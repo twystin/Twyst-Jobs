@@ -95,7 +95,7 @@ function getUserTransport(user) {
 	return user_transports;
 }
 
-function rewardify(input) {
+module.exports.rewardify =  rewardify = function(input) {
     if (input.ranges[0].reward.custom && input.ranges[0].reward.custom.text) {
         return input.ranges[0].reward.custom.text;
     } else if (input.ranges[0].reward.flat && (input.ranges[0].reward.flat.off || input.ranges[0].reward.flat.spend)) {
