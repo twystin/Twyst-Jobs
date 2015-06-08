@@ -33,9 +33,10 @@ function processSms(user, special, voucher) {
 	
 	console.log("VOUCHER " + JSON.stringify(voucher));
 	console.log("WINBACK " + JSON.stringify(special));
-
-	var push_message = "Birthday wishes from " + special.outlets[0].basics.name + "! We have a little something for you – " + rewardify(special) + " - when you visit next. Voucher code "+ voucher.basics.code +" (valid till "+ Utils.formatDate(voucher.validity.end_date) +"). To claim, just show this to your server. See you soon! Call "+ outlet_phone +" to reserve/order.";
-	saveReminder(user.phone, push_message, special.validity.send_at.at_hours); 
+	
+	var push_message = "Your birthday is coming up, celebrate with us at " +special.outlets[0].basics.name+"! Here is something special for the big day," +rewardify(special)+". Your Twyst voucher code is " + voucher.basics.code + " (valid "+ Utils.formatDate(voucher.validity.start_date) + " to " + Utils.formatDate(voucher.validity.end_date) +"), just present your voucher to claim. See you soon! Call "+outlet_phone+ " to book your celebration/more details."
+	
+	saveReminder(user.phone, push_message.replace(',A', ', get a'), special.validity.send_at.at_hours); 
 }
 
 function processConsole() {
