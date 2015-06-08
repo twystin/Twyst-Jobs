@@ -68,8 +68,6 @@ function initCheckin() {
 		});
 	});
 };
-VoucherReminder/reminder.js
-birthday/job.js
 function httpCheckin (user, cb) {
 	rest.post(config.checkin_url, {
 		data: user
