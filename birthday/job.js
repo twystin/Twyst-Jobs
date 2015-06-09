@@ -3,6 +3,7 @@
 
 var mongoose = require('mongoose');
 var async = require('async');
+var schedule = require('node-schedule');
 require('../config/config_models')();
 var Special = mongoose.model('SpecialProgram'),
   Outlet = mongoose.model('Outlet'),
@@ -12,8 +13,9 @@ var Special = mongoose.model('SpecialProgram'),
   keygen = require("keygenerator"),
   Transport = require('./transport');
 
-
-(function main() {
+var job = schedule.scheduleJob({hour: 4, minute: 30, dayOfWeek: [new schedule.Range(0,6)]}, main);
+main();
+function main() {
   mongoose.connect('mongodb://localhost/twyst');
   getSpecialPrograms(function(err, specials) {
     if (err) {
@@ -23,7 +25,7 @@ var Special = mongoose.model('SpecialProgram'),
       processSpecialPrograms(specials);
     }
   });
-})();
+};
 
 function getSpecialPrograms(cb) {
   // Do some filtering here.
@@ -63,7 +65,22 @@ function processSpecialProgram(special, callback) {
 
         getUsersWithBirthdayInTheHorizon(users, days, function(u, c) {
           if (u !== undefined) {
-            saveVoucher(u, special, sendMessage);
+            Voucher.findOne({
+              'issue_details.issued_to': u._id,
+              'basics.type': 'WINBACK',
+              'basics.description': /birthday/ 
+            }).exec(function (err, voucher) {
+              if(err) {
+                console.log(err)
+              }
+              else if(voucher) {
+                console.log('voucher already generated ');
+              }
+              else {
+                saveVoucher(u, special, sendMessage);
+              }
+            })
+            
           } else {
             console.log("Error: Undefined user");
           }
@@ -128,7 +145,7 @@ function getUsersWithBirthdayInTheHorizon(users, days, cb) {
               cb(user, u.count);
             }
           } else {
-            console.log("Account is null");
+            //console.log("Account is null");
           }
         }
       })
@@ -155,7 +172,7 @@ function sendMessage(err, u, w, v) {
 }
 
 function getVoucherObject(special, user) {
-  //console.log(JSON.stringify(special))
+  //console .log(JSON.stringify(special))
   var voucher = {
     basics: {
       code: keygen._({
@@ -163,7 +180,7 @@ function getVoucherObject(special, user) {
         length: 6,
         exclude: ['O', '0', 'L', '1']
       }),
-      type: 'BIRTHDAY',
+      type: 'WINBACK',
       description: Transport.rewardify(special)
     },
     validity: {
