@@ -62,12 +62,13 @@ function getFilterQuery() {
 			$lt: getRealDate(13)
 		},
 		'validity': {
-			$gte: new Date(Date.now()).setHours(0, 0, 1)
+			$gte: new Date(Date.now()).setHours(23,59,59,999)
 		}
 	};
 
 	var q = {
 		'basics.status': 'active',
+		'basics.type': 'CHECKIN',
 		'validity.end_date': date.validity,
 		$or:[{
 				'checkin_details.batch': true,
